@@ -24,3 +24,12 @@ from typing import List, Tuple
 def major_and_minor_elem(inp: List) -> Tuple[int, int]:
     counter = Counter(inp).most_common()
     return counter[0][0], counter[-1][0]
+
+
+def major_and_minor_elem_2(inp: List) -> Tuple[int, int]:
+    elements_count = {}
+    for element in inp:
+        elements_count[element] = elements_count.get(element, 0)
+
+    elements_count_sorted = sorted(elements_count)
+    return elements_count_sorted[-1], elements_count_sorted[0]

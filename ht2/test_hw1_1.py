@@ -1,6 +1,6 @@
 import pytest
 
-from hw1_1 import major_and_minor_elem
+from hw1_1 import major_and_minor_elem, major_and_minor_elem_2
 
 LISTS = [
     ([2, 2, 1, 1, 1, 2, 2], (2, 1)), 
@@ -11,8 +11,11 @@ LISTS = [
 ]
 
 
-@pytest.mark.parametrize(
-    "numbers, expected", LISTS
-)
+@pytest.mark.parametrize("numbers, expected", LISTS)
 def test_major_and_minor_elem(numbers, expected):
     assert major_and_minor_elem(numbers) == expected
+
+
+@pytest.mark.parametrize("numbers, expected", LISTS)
+def test_major_and_minor_elem_2(numbers, expected):
+    assert major_and_minor_elem_2(numbers) == expected
