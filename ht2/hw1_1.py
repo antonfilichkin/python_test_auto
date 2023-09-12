@@ -29,7 +29,7 @@ def major_and_minor_elem(inp: List) -> Tuple[int, int]:
 def major_and_minor_elem_2(inp: List) -> Tuple[int, int]:
     elements_count = {}
     for element in inp:
-        elements_count[element] = elements_count.get(element, 0)
+        elements_count[element] = elements_count.get(element, 0) + 1
 
-    elements_count_sorted = sorted(elements_count)
+    elements_count_sorted = sorted(elements_count, key=elements_count.get)
     return elements_count_sorted[-1], elements_count_sorted[0]
