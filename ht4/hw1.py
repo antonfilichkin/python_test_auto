@@ -23,7 +23,7 @@ Check file with tests to see how all these classes are used. You can create any 
 you want.
 """
 
-from typing import List, Tuple
+from typing import Dict, Set
 
 
 class DeadlineError(Exception):
@@ -33,12 +33,20 @@ class DeadlineError(Exception):
 
 
 class Homework:
-    def __init__(self, deadline: int):
+    def __init__(self, name: str, deadline: int):
+        self._name = name
         self._deadline = deadline
 
     def check_deadline(self):
         if self._deadline < 0:
             raise DeadlineError("You are late")
+
+
+class Solution:
+    def __init__(self, author: 'Student', homework: Homework, solution: str):
+        self.homework = homework
+        self.author = author
+        self.solution = solution
 
 
 class Person:
@@ -47,13 +55,33 @@ class Person:
         self.name = name
 
 
-class Teacher(Person):
-    @staticmethod
-    def create_homework(deadline: int) -> Homework:
-        return Homework(deadline)
-
-
 class Student(Person):
-    @staticmethod
-    def do_homework(homework: Homework, solution: str):
+    def do_homework(self, homework: Homework, solution: str) -> Solution:
         homework.check_deadline()
+        return Solution(self, homework, solution)
+
+
+class Teacher(Person):
+    homework_done: Dict[Homework, Set[Solution]] = {}
+
+    @staticmethod
+    def create_homework(task: str, deadline: int) -> Homework:
+        return Homework(task, deadline)
+
+    @classmethod
+    def check_homework(cls, solution: Solution) -> bool:
+        if solution.homework not in cls.homework_done:
+            cls.homework_done[solution.homework] = set()
+
+        if len(solution.solution) > 5:
+            cls.homework_done[solution.homework].add(solution)
+            return True
+        else:
+            return False
+
+    @classmethod
+    def reset_results(cls, homework: Homework = None):
+        if homework is None:
+            cls.homework_done.clear()
+        else:
+            cls.homework_done.pop(homework)

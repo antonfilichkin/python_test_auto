@@ -11,8 +11,8 @@ def prepare_test_classes():
     first_student = Student("Hopper", "Grace")
     second_student = Student("Turing", "Alan")
 
-    first_hw = Teacher.create_homework(1)
-    second_hw = Teacher.create_homework(5)
+    first_hw = Teacher.create_homework("OOP homework", 1)
+    second_hw = Teacher.create_homework("Read the documentation", 5)
     return (
         first_teacher,
         second_teacher,
@@ -24,7 +24,7 @@ def prepare_test_classes():
 
 
 def test_deadline_exception():
-    hw = Teacher.create_homework(-1)
+    hw = Teacher.create_homework("Expired hw", -1)
     with pytest.raises(DeadlineError, match="You are late"):
         Student("Green", "Robert").do_homework(hw, "solution")
 
