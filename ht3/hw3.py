@@ -36,10 +36,12 @@ def custom_range(*args):
     if len(args) > 2:
         start = stop
         stop = string.index(args[2])
+
         if len(args) > 3:
             step = args[3]
 
     result = list()
+
     for i in range(start, stop, step):
         result.append(string[i])
 
