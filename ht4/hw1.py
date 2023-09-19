@@ -34,11 +34,12 @@ class DeadlineError(Exception):
 
 class Homework:
     def __init__(self, name: str, deadline: int):
-        self._name = name
-        self._deadline = date.today() + timedelta(days=deadline)
+        self.name = name
+        self.deadline = timedelta(days=deadline)
+        self._created = date.today()
 
     def check_deadline(self):
-        if date.today() > self._deadline:
+        if self._created - date.today() > self.deadline:
             raise DeadlineError("You are late")
 
 
