@@ -22,8 +22,8 @@ Homework is solved if solution has more than 5 symbols.
 Check file with tests to see how all these classes are used. You can create any additional classes 
 you want.
 """
-
 from typing import Dict, Set
+from datetime import date, timedelta
 
 
 class DeadlineError(Exception):
@@ -35,10 +35,10 @@ class DeadlineError(Exception):
 class Homework:
     def __init__(self, name: str, deadline: int):
         self._name = name
-        self._deadline = deadline
+        self._deadline = date.today() + timedelta(days=deadline)
 
     def check_deadline(self):
-        if self._deadline < 0:
+        if date.today() > self._deadline:
             raise DeadlineError("You are late")
 
 
