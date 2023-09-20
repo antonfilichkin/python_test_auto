@@ -40,9 +40,4 @@ def custom_range(*args):
         if len(args) > 3:
             step = args[3]
 
-    result = list()
-
-    for i in range(start, stop, step):
-        result.append(string[i])
-
-    return result
+    return list(string[slice(start, stop, step)])
