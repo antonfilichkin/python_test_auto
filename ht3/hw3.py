@@ -26,18 +26,10 @@ assert = custom_range(string.ascii_lowercase, 'p', 'g', -2) == ['p', 'n', 'l', '
 """
 
 
-def custom_range(*args):
-    string = args[0]
+def custom_range(string, arg1, *args):
+    slice_arg_list = [string.index(arg1)]
 
-    stop = string.index(args[1])
-    start = 0
-    step = 1
+    if args:
+        slice_arg_list.append(string.index(args[0]))
 
-    if len(args) > 2:
-        start = stop
-        stop = string.index(args[2])
-
-        if len(args) > 3:
-            step = args[3]
-
-    return list(string[slice(start, stop, step)])
+    return list(string[slice(*slice_arg_list, *args[1:])])

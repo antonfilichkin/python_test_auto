@@ -26,5 +26,3 @@ def test_custom_range(given, expected):
 def test_positional_only():
     for _, kw in inspect.signature(custom_range).parameters.items():
         assert kw.default == inspect.Parameter.empty
-
-
