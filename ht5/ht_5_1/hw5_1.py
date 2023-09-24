@@ -26,7 +26,7 @@ import keyword
 import re
 
 
-class KeyValueStorage():
+class KeyValueStorage:
     """Class docstring"""
 
     __valid_name_pattern__ = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
