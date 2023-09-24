@@ -1,0 +1,6 @@
+name=kek
+last_name=top
+power=9001
+negative_power=-9001
+song=shadilay
+__doc__=Not expected
