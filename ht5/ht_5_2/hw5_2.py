@@ -21,28 +21,35 @@ import sqlite3
 class TableData:
 
     def __init__(self, database_name: str, table_name: str):
-        self.__conn__ = sqlite3.connect(database_name)
-        self.table = table_name
+        self.__connection__ = sqlite3.connect(database_name)
+        self.__connection__.row_factory = sqlite3.Row
+        self.__table__ = table_name
+
+    def __del__(self):
+        self.__connection__.close()
+
+    def __fetchone__(self, *args):
+        cursor = self.__connection__.cursor()
+        cursor.execute(*args)
+        return cursor.fetchone()
 
     def __len__(self):
-        cursor = self.__conn__.cursor()
-        cursor.execute(f'SELECT count(*) FROM {self.table}')
-        return cursor.fetchone()[0]
+        return self.__fetchone__(f"SELECT count(*) FROM {self.__table__}")['count(*)']
 
-    # def __getitem__(self, key):
-    #     if key in self.data:
-    #         return self.data[key]
-    #     else:
-    #         raise KeyError(f"'{key}' not found in MyIterable")
-    #
-    # def __iter__(self):
-    #     return
-    #
-    # def __next__(self):
-    #     if self.current_value > self.max_value:
-    #         # When there are no more items to iterate, raise StopIteration.
-    #         raise StopIteration
-    #     else:
-    #         result = self.current_value
-    #         self.current_value += 1
-    #         return result
+    def __getitem__(self, key):
+        return self.__fetchone__(f"SELECT name FROM {self.__table__} WHERE author = ?", (key,))['name']
+
+    def __contains__(self, key):
+        return self.__fetchone__(f"SELECT * FROM {self.__table__} WHERE author = ?", (key,)) is not None
+
+    def __iter__(self):
+        self.__iter_cursor__ = self.__connection__.cursor()
+        self.__iter_cursor__.execute(f"SELECT * FROM {self.__table__} ORDER BY author")
+        return self
+
+    def __next__(self):
+        self.__row__ = self.__iter_cursor__.fetchone()
+        if self.__row__ is None:
+            raise StopIteration
+        else:
+            return dict(self.__row__)
