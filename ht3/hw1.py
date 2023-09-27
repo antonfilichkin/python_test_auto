@@ -42,14 +42,13 @@ def validate_date(date: str) -> bool:
 
 def check_data(filepath: str, validators: Iterable[Callable]) -> str:
     result_file_name = 'result.txt'
-    with open(result_file_name, 'w') as result_file:
-        with open(filepath) as file:
-            for line in file:
-                line = line.strip()
-                for validator in validators:
-                    if not validator(line):
-                        result_file.write(f'{line} {validator.__name__}\n')
-                        break
+    with open(result_file_name, 'w') as result_file, open(filepath) as file:
+        for line in file:
+            line = line.strip()
+            for validator in validators:
+                if not validator(line):
+                    result_file.write(f'{line} {validator.__name__}\n')
+                    break
 
     return result_file_name
 
