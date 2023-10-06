@@ -15,32 +15,32 @@ Part 2: Manipulating with Database
         Print data from table
         Delete all data from table
 """
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
-from sqlalchemy.orm import declarative_base, relationship, Session
-from typing import List, Type
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, select, asc, delete
+from sqlalchemy.orm import relationship, Session, Mapped, DeclarativeBase
+from typing import List
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
 
 
 class DB:
     def __init__(self, file_name):
-        self.__url__ = f'sqlite:///{file_name}'
+        self.engine = create_engine(f'sqlite:///{file_name}')
 
     def __enter__(self):
-        self.engine = create_engine(self.__url__, echo=True)
         self.session = Session(self.engine)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.session.close()
-        self.engine.dispose()
 
 
 class Director(Base):
     __tablename__ = 'directors'
 
-    id: Column[int] = Column(Integer, primary_key=True)
-    name: Column[str] = Column(String(32), unique=True)
+    id: Mapped[int] = Column(Integer, primary_key=True)
+    name: Mapped[str] = Column(String(32), unique=True)
     films = relationship("Film", back_populates="director")
 
     def __repr__(self) -> str:
@@ -50,10 +50,10 @@ class Director(Base):
 class Film(Base):
     __tablename__ = 'films'
 
-    id: Column[int] = Column(Integer, primary_key=True)
-    title: Column[str] = Column(String(128), unique=True)
-    director_id: Column[int] = Column(Integer, ForeignKey('directors.id'))
-    year: Column[int] = Column(Integer)
+    id: Mapped[int] = Column(Integer, primary_key=True)
+    title: Mapped[str] = Column(String(128), unique=True)
+    director_id: Mapped[int] = Column(Integer, ForeignKey('directors.id'))
+    year: Mapped[int] = Column(Integer)
     director = relationship("Director", back_populates="films")
 
     def __repr__(self) -> str:
@@ -86,15 +86,15 @@ def add_table_data(db: DB):
 
 
 def modify_table_data(db: DB):
-    director = db.session.query(Director).filter_by(name='Andy Wachowski, Larry Wachowski').first()
-    director.name = 'Lana Wachowski, Lilly Wachowski'
-    db.session.flush()
+    stmt = select(Director).where(Director.name == 'Andy Wachowski, Larry Wachowski')
+    db.session.scalars(stmt).one().name = 'Lana Wachowski, Lilly Wachowski'
     db.session.commit()
 
 
 def print_table_data(db: DB) -> List[str]:
     films = []
-    for film in db.session.query(Film).order_by(Film.id).all():
+    stmt = select(Film).order_by(asc(Film.id))
+    for film in db.session.scalars(stmt).all():
         print(film)
         films.append(str(film))
 
@@ -102,8 +102,8 @@ def print_table_data(db: DB) -> List[str]:
 
 
 def delete_tables(db):
-    db.session.query(Film).delete()
-    db.session.query(Director).delete()
+    db.session.execute(delete(Film))
+    db.session.execute(delete(Director))
     db.session.commit()
 
 

@@ -2,7 +2,7 @@ import pytest
 import os
 
 from typing import Type
-from sqlalchemy import MetaData, desc
+from sqlalchemy import MetaData, desc, func
 from hw7 import *
 
 
@@ -30,28 +30,20 @@ def test_add_table_data():
     with DB('films.db') as db:
         add_table_data(db)
 
-        film = db.session.query(Film).\
-            filter(Film.director.has(name='David Fincher')).\
-            order_by(desc(Film.title)).\
-            first()
+        stmt = select(Film).where(Film.director.has(name='David Fincher')).order_by(desc(Film.title))
 
-        assert (film.title, film.director.name) == ('Se7en', 'David Fincher')
+        for expected_film, film in zip([('Se7en', 'David Fincher'), ('Fight Club', 'David Fincher')], db.session.scalars(stmt).all()):
+            assert (film.title, film.director.name) == expected_film
 
 
 @pytest.mark.run(order=3)
 def test_modify_table_data():
+    stmt = select(Film).where(Film.title == 'The Matrix')
 
     with (DB('films.db') as db):
-        assert _get_film_director(db, 'The Matrix') == 'Andy Wachowski, Larry Wachowski'
+        assert db.session.scalars(stmt).one().director.name == 'Andy Wachowski, Larry Wachowski'
         modify_table_data(db)
-        assert _get_film_director(db, 'The Matrix') == 'Lana Wachowski, Lilly Wachowski'
-
-
-def _get_film_director(db: DB, film: str) -> str:
-    return db.session.query(Film).\
-        filter(Film.title == f'{film}').\
-        first().\
-        director.name
+        assert db.session.scalars(stmt).one().director.name == 'Lana Wachowski, Lilly Wachowski'
 
 
 @pytest.mark.run(order=4)
@@ -68,6 +60,7 @@ def test_print_table_data():
 
 @pytest.mark.run(order=5)
 def test_delete_table_data():
+
     with (DB('films.db') as db):
         assert _get_table_count(db, Film) == 5
         assert _get_table_count(db, Director) == 4
@@ -86,4 +79,5 @@ def test_delete_table_data():
 
 
 def _get_table_count(db: DB, table: Type) -> int:
-    return db.session.query(table).count()
+    stmt = select(func.count()).select_from(table)
+    return db.session.execute(stmt).scalar()
