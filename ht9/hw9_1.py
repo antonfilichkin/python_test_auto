@@ -30,15 +30,13 @@ class Company:
 async def _fetch_html(url: str) -> str:
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
-            if response.status == 200:
-                return await response.text()
-            else:
-                return ''
+            return await response.text()
 
 
-def _collect_companies_from_table(html: str) -> list[Company]:
+async def _collect_companies_from_table(url: str) -> list[Company]:
     companies = []
 
+    html = await _fetch_html(url)
     if html:
         soup = BeautifulSoup(html, 'html.parser')
         table = soup.find('main').find('tbody')
@@ -52,12 +50,11 @@ def _collect_companies_from_table(html: str) -> list[Company]:
     return companies
 
 
-def _enrich_company_info_from_page(company: Company, html: str) -> Company:
+async def _enrich_company_info_from_page(company: Company) -> Company:
+    html = await _fetch_html(company.url)
     soup = BeautifulSoup(html, 'html.parser')
     company.price = float(soup.find('span', class_='price-section__current-value').get_text().replace(',', ''))
-
     company.code = soup.find('span', class_='price-section__category').find('span').get_text().replace(', ', '')
-
     pe_label = soup.find('div', class_='snapshot__header', string='P/E Ratio')
     if pe_label:
         pe_value = pe_label.find_parent('div', class_='snapshot__data-item').find(string=True, recursive=False).strip()
@@ -67,19 +64,15 @@ def _enrich_company_info_from_page(company: Company, html: str) -> Company:
 
 
 async def main():
+    table_page_url = f'{sp_url}/index/components/s&p_500?p='
 
-    fetch_table_page_tasks = [_fetch_html(f'{sp_url}/index/components/s&p_500?p={page}') for page in range(1, 12)]
-    table_pages = await asyncio.gather(*fetch_table_page_tasks)
+    fetch_companies_tasks = [_collect_companies_from_table(f'{table_page_url}{page}') for page in range(1, 12)]
+    companies = await asyncio.gather(*fetch_companies_tasks)
 
-    companies = []
-    for page in table_pages:
-        companies.extend(_collect_companies_from_table(page))
+    companies = [company for table_page_companies in companies for company in table_page_companies]
 
-    fetch_company_data_tasks = [_fetch_html(company.url) for company in companies]
-    companies_pages = await asyncio.gather(*fetch_company_data_tasks)
-
-    for company, company_page in zip(companies, companies_pages):
-        _enrich_company_info_from_page(company, company_page)
+    fetch_company_data_tasks = [_enrich_company_info_from_page(company) for company in companies]
+    companies = await asyncio.gather(*fetch_company_data_tasks)
 
     def sort_key(company: Company, field: str):
         if field == 'pe_ratio':
