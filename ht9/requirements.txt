@@ -2,3 +2,4 @@ pytest
 aiohttp
 asyncio
 beautifulsoup4
+requests

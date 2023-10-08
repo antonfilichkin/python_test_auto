@@ -19,11 +19,11 @@ class Company:
 
     def __json__(self):
         return {
-            "code": self.code,
-            "name": self.name,
-            "price": self.price,
-            "pe_ratio": self.pe_ratio,
-            "growth": self.year_change
+            'code': self.code,
+            'name': self.name,
+            'price': self.price,
+            'pe_ratio': self.pe_ratio,
+            'growth': self.year_change
         }
 
 
@@ -82,15 +82,17 @@ async def main():
                 return company.pe_ratio
 
     results = {
-        "most_expensive": sorted(companies, key=lambda company: company.price, reverse=True)[:10],
-        "lowest_pe": sorted(companies, key=lambda company: sort_key(company, 'pe_ratio'))[:10],
-        "most_grow": sorted(companies, key=lambda company: company.year_change, reverse=True)[:10]
+        'most_expensive': sorted(companies, key=lambda company: company.price, reverse=True)[:10],
+        'lowest_pe': sorted(companies, key=lambda company: sort_key(company, 'pe_ratio'))[:10],
+        'most_grow': sorted(companies, key=lambda company: company.year_change, reverse=True)[:10]
     }
 
     for name, result in results.items():
         with open(f'{name}.json', 'w') as file:
             json_result = json.dumps(result, default=lambda company: company.__json__(), indent=4)
             file.write(json_result)
+
+    print(f"Async - parsed '{len(companies)}' companies")
 
 
 def run_async_main():
@@ -99,4 +101,4 @@ def run_async_main():
 
 if __name__ == '__main__':
     execution_time = timeit.timeit(run_async_main, number=1)
-    print(f"Execution time: {execution_time} seconds")
+    print(f'Execution time: {execution_time} seconds')
