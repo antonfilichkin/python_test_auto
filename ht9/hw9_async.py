@@ -21,8 +21,8 @@ async def _enrich_(company: Company) -> Company:
     return enrich_company_info_from_page(company, html)
 
 
-async def main():
-    fetch_companies_tasks = [_collect_companies_(f'{table_page_url}{page}') for page in range(1, 12)]
+async def _main_(pages: int) -> int:
+    fetch_companies_tasks = [_collect_companies_(f'{table_page_url}{page}') for page in range(1, pages + 1)]
     companies = await asyncio.gather(*fetch_companies_tasks)
 
     companies = [company for table_page_companies in companies for company in table_page_companies]
@@ -31,13 +31,13 @@ async def main():
     companies = await asyncio.gather(*fetch_company_data_tasks)
 
     write_results(companies)
-    print(f"Async - parsed '{len(companies)}' companies")
+    return len(companies)
 
 
-def run_async_main():
-    asyncio.run(main())
+def execute(pages: int = 1) -> int:
+    return asyncio.run(_main_(pages))
 
 
 if __name__ == '__main__':
-    execution_time = timeit.timeit(run_async_main, number=1)
-    print(f'Async - execution time: {execution_time:.2f} seconds')
+    execution_time = timeit.timeit(lambda: execute(pages_to_parse()), number=1)
+    print(f'Async - execution time: {execution_time:.2f} seconds.')

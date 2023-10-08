@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from json import dumps
+from sys import argv
 
 sp_url = 'https://markets.businessinsider.com'
 table_page_url = f'{sp_url}/index/components/s&p_500?p='
@@ -22,6 +23,12 @@ class Company:
             'pe_ratio': self.pe_ratio,
             'growth': self.year_change
         }
+
+
+def pages_to_parse() -> int:
+    if len(argv) >= 2:
+        return int(argv[1])
+    return 11
 
 
 def collect_companies_from_table(html: str) -> list[Company]:

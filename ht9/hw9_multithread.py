@@ -25,21 +25,24 @@ def _enrich_(company: Company) -> Company:
     return enrich_company_info_from_page(company, html)
 
 
-def main():
-    companies = []
-
-    table_page_urls = [f'{table_page_url}{page}' for page in range(1, 12)]
+def _main_(pages: int) -> int:
+    table_page_urls = [f'{table_page_url}{page}' for page in range(1, pages + 1)]
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
-        companies.extend(pool.map(_collect_companies_, table_page_urls))
+        companies = pool.map(_collect_companies_, table_page_urls)
 
     companies = [company for table_page_companies in companies for company in table_page_companies]
+
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
         pool.map(_enrich_, companies)
 
     write_results(companies)
-    print(f"Multithread - parsed '{len(companies)}' companies.")
+    return len(companies)
+
+
+def execute(pages: int = 1) -> int:
+    return _main_(pages)
 
 
 if __name__ == '__main__':
-    execution_time = timeit.timeit(main, number=1)
+    execution_time = timeit.timeit(lambda: execute(pages_to_parse()), number=1)
     print(f'Multithread - execution time: {execution_time:.2f} seconds.')
