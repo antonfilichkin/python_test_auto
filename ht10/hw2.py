@@ -39,3 +39,11 @@ class Order:
         if not self.discount:
             return self.price
         return self.discount(self)
+
+
+def morning_discount(order):
+    return order.price * 0.5
+
+
+def elder_discount(order):
+    return order.price * 0.1

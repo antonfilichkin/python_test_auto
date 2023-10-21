@@ -1,17 +1,9 @@
-from hw2 import Order
-
-
-def morning_discount(order):
-    return order.price * 0.5
-
-
-def elder_discount(order):
-    return order.price * 0.1
+from hw2 import Order, morning_discount, elder_discount
 
 
 def test_order_no_discount():
-    order_2 = Order(100)
-    assert order_2.final_price() == 100
+    order = Order(100)
+    assert order.final_price() == 100
 
 
 def test_order_morning_discount():
