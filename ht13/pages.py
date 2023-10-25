@@ -1,3 +1,4 @@
+from selenium.webdriver.common.by import By
 from seleniumpagefactory.Pagefactory import PageFactory
 
 
@@ -14,6 +15,7 @@ class BasePage(PageFactory):
 
     def open(self):
         self.driver.get(self.get_url())
+        return self
 
 
 class LoginPage(BasePage):
@@ -23,23 +25,36 @@ class LoginPage(BasePage):
         self.url = ''
 
     locators = {
-        'input_username': ('ID', 'user-name'),
-        'input_password': ('ID', 'password'),
-        'button_login': ('NAME', 'login-button'),
+        'username_input': ('ID', 'user-name'),
+        'password_input': ('ID', 'password'),
+        'login_button': ('NAME', 'login-button'),
+
         'login_credentials': ('CSS', '.login_credentials'),
-        'login_password': ('XPATH', "//div[contains(@class, 'login_password')]")
+        'login_password': ('XPATH', "//div[contains(@class, 'login_password')]"),
+
+        'login_error_message': ('CSS', '.error-message-container h3'),
+        'login_error_message_button': ('CSS', '.error-message-container button')
     }
 
     def login(self, name, password):
-        self.input_username.set_text(name)
-        self.input_password.set_text(password)
-        self.button_login.click_button()
+        self.username_input.set_text(name)
+        self.password_input.set_text(password)
+        self.login_button.click_button()
 
     def get_credentials(self):
         return str(self.login_credentials.get_text()).split('\n')[1:]
 
     def get_password(self):
         return str(self.login_password.get_text()).split('\n')[1]
+
+    def is_login_error_shown(self):
+        return len(self.driver.find_elements(By.CSS_SELECTOR, '.error-message-container > h3')) > 0
+
+    def get_login_error_text(self):
+        return self.login_error_message.get_text()
+
+    def close_login_error(self):
+        return self.login_error_message_button.click_button()
 
 
 class InventoryPage(BasePage):
