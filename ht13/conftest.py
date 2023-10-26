@@ -9,9 +9,18 @@ def base_path():
 
 @pytest.fixture
 def driver():
-    driver = webdriver.Chrome()
-    driver.implicitly_wait(2)
+    driver = chrome_driver()
 
     yield driver
     driver.quit()
 
+
+def chrome_driver():
+    options = webdriver.ChromeOptions()
+    options.add_argument("--start-maximized")
+    options.add_experimental_option("excludeSwitches", ["enable-logging"])
+
+    driver = webdriver.Chrome(options)
+    driver.implicitly_wait(2)
+
+    return driver

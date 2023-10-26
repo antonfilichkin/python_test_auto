@@ -26,3 +26,4 @@ def test_login_locked_out_user(driver, base_path):
     assert login_page.is_login_error_shown()
     assert login_page.get_login_error_text() == 'Epic sadface: Sorry, this user has been locked out.'
     login_page.close_login_error()
+    assert not login_page.is_login_error_shown()
