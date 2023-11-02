@@ -1,4 +1,4 @@
-import os
+from os import environ, path, makedirs
 
 from pytest import fixture, hookimpl
 from selenium import webdriver
@@ -6,20 +6,20 @@ from logging import getLogger
 from datetime import datetime
 
 from ..test_data.users import *
+from .setup_steps import *
 
 LOGGER = getLogger()
 
 
-@fixture
-def base_path():
-    return 'https://www.demoblaze.com'
+def pytest_generate_tests():
+    environ['BASE_PATH'] = 'https://www.demoblaze.com'
 
 
 @fixture(scope='session')
 def driver():
     driver = chrome_driver()
-
     yield driver
+    driver.close()
     driver.quit()
 
 
@@ -53,5 +53,5 @@ def pytest_runtest_makereport(item, call):
 
 
 def create_screenshots_folder(folder_name):
-    if not os.path.exists(f'./{folder_name}'):
-        os.makedirs(f'./{folder_name}')
+    if not path.exists(f'./{folder_name}'):
+        makedirs(f'./{folder_name}')
