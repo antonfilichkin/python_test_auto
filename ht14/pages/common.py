@@ -23,7 +23,9 @@ class NavBar(PageFactory):
 
     def log_in(self, user):
         self.login.click()
-        SignInModal(self.driver).log_in(user)
+        sign_in_modal = SignInModal(self.driver)
+        sign_in_modal.wait_for_show()
+        sign_in_modal.log_in(user)
         self.wait_for_logged_in()
 
     def log_out(self):
@@ -36,9 +38,9 @@ class NavBar(PageFactory):
     def wait_for_logged_out(self):
         self.__wait_for_fifth_nav_menu_item_to_be__('Log in')
 
-    def __wait_for_fifth_nav_menu_item_to_be__(self, expected: str, timeout: int = 2):
-        wait = WebDriverWait(self.driver, timeout)
-        wait.until(lambda driver: self.navbar_elements_texts()[4] == expected)
+    def __wait_for_fifth_nav_menu_item_to_be__(self, expected: str):
+        wait = WebDriverWait(self.driver, 3)
+        wait.until(lambda a: self.navbar_elements_texts()[4] == expected)
 
 
 class SideMenu(PageFactory):
@@ -68,15 +70,19 @@ class Modal(PageFactory):
         self.locators = {'close_button': ('CSS', f'#{modal_id} button[data-dismiss="modal"]')}
 
     def is_shown(self) -> bool:
-        return len(self.driver.find_elements(By.ID, self.__modal_id__)) > 0
+        return self.driver.find_element(By.ID, self.__modal_id__).is_displayed()
 
     def close(self):
         self.close_button.click_button()
         self.wait_for_close()
 
+    def wait_for_show(self, timeout: int = 2):
+        wait = WebDriverWait(self.driver, timeout)
+        wait.until(lambda a: self.is_shown())
+
     def wait_for_close(self, timeout: int = 2):
         wait = WebDriverWait(self.driver, timeout)
-        wait.until(ec.invisibility_of_element_located((By.ID, self.__modal_id__)))
+        wait.until(lambda a: not self.is_shown())
 
 
 class SignInModal(Modal):

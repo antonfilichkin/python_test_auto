@@ -12,8 +12,9 @@ def test_1_login_existing_user(driver, existing_user):
         'Home', 'Contact', 'About us', 'Cart', 'Log in', 'Sign up'
     ]
 
-    sign_in_modal = SignInModal(driver)
     main_page.nav_bar.login.click_button()
+    sign_in_modal = SignInModal(driver)
+    sign_in_modal.wait_for_show()
     assert sign_in_modal.username_input.is_displayed()
     assert sign_in_modal.password_input.is_displayed()
 
