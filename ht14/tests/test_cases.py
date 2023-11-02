@@ -4,25 +4,24 @@ from ..pages.common import SignInModal
 
 LOGGER = getLogger()
 
-expected_navmenu_guest = ['Home', 'Contact', 'About us', 'Cart', 'Log in', 'Sign up']
-
 
 def test_1_login_existing_user(driver, existing_user):
-    expected_navmenu_logged = ['Home', 'Contact', 'About us', 'Cart', 'Log out', f'Welcome {existing_user.name}']
-
     main_page = MainPage(driver)
-    sign_in_modal = SignInModal(driver)
-
     main_page.open()
-    assert main_page.nav_bar.navbar_elements_texts() == expected_navmenu_guest
+    assert main_page.nav_bar.navbar_elements_texts() == [
+        'Home', 'Contact', 'About us', 'Cart', 'Log in', 'Sign up'
+    ]
 
+    sign_in_modal = SignInModal(driver)
     main_page.nav_bar.login.click_button()
     assert sign_in_modal.username_input.is_displayed()
     assert sign_in_modal.password_input.is_displayed()
 
     sign_in_modal.log_in(existing_user)
     main_page.nav_bar.wait_for_logged_in()
-    assert main_page.nav_bar.navbar_elements_texts() == expected_navmenu_logged
+    assert main_page.nav_bar.navbar_elements_texts() == [
+        'Home', 'Contact', 'About us', 'Cart', 'Log out', f'Welcome {existing_user.name}'
+    ]
 
 
 def test_2_add_product_to_cart(driver, log_in, clear_cart):

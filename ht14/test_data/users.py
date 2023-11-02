@@ -1,12 +1,13 @@
+from dataclasses import dataclass
 from pytest import fixture
 
 
+@dataclass
 class User:
-    def __init__(self, name: str, password: str):
-        self.name = name
-        self.password = password
+    name: str
+    password: str
 
 
 @fixture
 def existing_user():
-    return type('User', (object,), {'name': 'Name27102023', 'password': 'Name27102023'})
+    return User('Name27102023', 'Name27102023')

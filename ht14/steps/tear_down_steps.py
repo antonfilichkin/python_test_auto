@@ -1,13 +1,14 @@
 from pytest import fixture
 
-from ht14.pages.pages import MainPage, CartPage
+from ..pages.pages import CartPage, MainPage
 
 
 @fixture
-def log_in(driver, existing_user):
+def log_out(driver):
+    yield
     main_page = MainPage(driver)
     main_page.open()
-    main_page.nav_bar.log_in(existing_user)
+    main_page.nav_bar.log_out()
 
 
 @fixture
