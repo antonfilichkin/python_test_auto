@@ -16,37 +16,14 @@ You will work with this endpoint - https://api.punkapi.com/v2/beers/8
  * status code - 404
  * message - No endpoint found that matches '/v2/beers/8'
 """
-from dataclasses import dataclass
 from pytest_check import check
 import requests
 
-from ht15.helpers import dataclass_from_dict
+from ht15.checks import has_ingredient
+from ht15.dtos import Ingredient, IngredientWithInstructions
 
 base_path = 'https://api.punkapi.com'
 endpoint_ut = '/v2/beers/8'
-
-
-@dataclass
-class Ingredient:
-    name: str
-    amount: type('Amount', (object,), {'value': float, 'unit': str})
-
-
-@dataclass
-class IngredientWithInstructions(Ingredient):
-    add: str
-    attribute: str
-
-
-@check.check_func
-def has_ingredient(beer, root_path, expected_ingredient, message='Ingredient check'):
-    ingredients = beer['ingredients']
-    try:
-        actual_ingredient = next(h for h in ingredients[root_path] if h['name'] == expected_ingredient.name)
-    except StopIteration:
-        assert False, (f"Was not able to find '{expected_ingredient.name}' ingredient!"
-                       f" Actual ingredient list: '{[h['name'] for h in ingredients[root_path]]}'")
-    assert dataclass_from_dict(type(expected_ingredient), actual_ingredient) == expected_ingredient, message
 
 
 def test_1_get():
