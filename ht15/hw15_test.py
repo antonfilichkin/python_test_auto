@@ -19,8 +19,8 @@ You will work with this endpoint - https://api.punkapi.com/v2/beers/8
 from pytest_check import check
 import requests
 
-from ht15.checks import has_ingredient
-from ht15.dtos import Ingredient, IngredientWithInstructions
+from checks import has_ingredient
+from dtos import Ingredient, IngredientWithInstructions
 
 base_path = 'https://api.punkapi.com'
 endpoint_ut = '/v2/beers/8'
@@ -39,11 +39,13 @@ def test_1_get():
     check.equal(beer['method']['fermentation']['temp']['value'], 10, 'Fermentation temp check')
 
     if not check.any_failures():  # Will run only if previous passed
-        expected_hops = IngredientWithInstructions('Hersbrucker', {'value': 6.25, 'unit': 'grams'}, 'middle', 'flavour')
-        has_ingredient(beer, 'hops', expected_hops)
+        check.equal(beer['ingredients']['yeast'], 'Wyeast 2007 - Pilsen Lager™',  'Yeast check')
 
-        expected_malt = (Ingredient('Acidulated Malt', {'value': 0.07, 'unit': 'kilograms'}), 'Acidulated Malt check')
-        has_ingredient(beer, 'malt', *expected_malt)
+        acidulated_malt = Ingredient('Acidulated Malt', {'value': 0.07, 'unit': 'kilograms'})
+        has_ingredient(beer, 'malt', acidulated_malt)
+
+        hersbrucker_hops = IngredientWithInstructions('Hersbrucker', {'value': 6.25, 'unit': 'grams'}, 'middle', 'flavour')
+        has_ingredient(beer, 'hops', hersbrucker_hops)
 
 
 def test_2_delete():
