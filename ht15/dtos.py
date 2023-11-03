@@ -2,9 +2,15 @@ from dataclasses import dataclass
 
 
 @dataclass
+class Amount:
+    value: float
+    unit: str
+
+
+@dataclass
 class Ingredient:
     name: str
-    amount: type('Amount', (object,), {'value': float, 'unit': str})
+    amount: Amount
 
 
 @dataclass
