@@ -37,7 +37,7 @@ def test_1_get():
     check.equal(beer['name'], 'Fake Lager', 'Name check')
     check.equal(beer['abv'], 4.7, 'ABV check')
     check.equal(beer['method']['fermentation']['temp']['value'], 10, 'Fermentation temp check')
-    check.equal(beer['method']['twist'], None, 'Twist check')
+    check.is_none(beer['method']['twist'], 'Twist check')
 
     if not check.any_failures():  # Will run only if previous passed
         check.equal(beer['ingredients']['yeast'], 'Wyeast 2007 - Pilsen Lager™',  'Yeast check')

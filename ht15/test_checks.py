@@ -1,9 +1,9 @@
-from pytest_check import check
+from pytest_check import check_func
 
 from helpers import dataclass_from_dict
 
 
-@check.check_func
+@check_func
 def has_ingredient(beer, root_path, expected_ingredient, message='Ingredient check'):
     ingredients = beer['ingredients']
     try:
