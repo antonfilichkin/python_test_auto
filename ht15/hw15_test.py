@@ -27,36 +27,46 @@ endpoint_ut = '/v2/beers/8'
 
 
 @dataclass
-class Hops:
+class Ingredient:
     name: str
     amount: type('Amount', (object,), {'value': float, 'unit': str})
+
+
+@dataclass
+class IngredientWithInstructions(Ingredient):
     add: str
     attribute: str
 
 
 @check.check_func
-def has_hops(beer, expected_hops: Hops):
+def has_ingredient(beer, root_path, expected_ingredient, message='Ingredient check'):
+    ingredients = beer['ingredients']
     try:
-        actual_hops = next(h for h in beer['ingredients']['hops'] if h['name'] == expected_hops.name)
+        actual_ingredient = next(h for h in ingredients[root_path] if h['name'] == expected_ingredient.name)
     except StopIteration:
-        present_hops = [h['name'] for h in beer['ingredients']['hops']]
-        assert False, f"Was not able to find '{expected_hops.name}' hops! Actual hops list: '{present_hops}'"
-    assert dataclass_from_dict(Hops, actual_hops) == expected_hops
+        assert False, (f"Was not able to find '{expected_ingredient.name}' ingredient!"
+                       f" Actual ingredient list: '{[h['name'] for h in ingredients[root_path]]}'")
+    assert dataclass_from_dict(type(expected_ingredient), actual_ingredient) == expected_ingredient, message
 
 
 def test_1_get():
     response = requests.get(base_path + endpoint_ut)
     assert response.status_code == 200
+
     body = response.json()
     assert len(body) == 1
+
     beer = body[0]
     check.equal(beer['name'], 'Fake Lager', 'Name check')
     check.equal(beer['abv'], 4.7, 'ABV check')
     check.equal(beer['method']['fermentation']['temp']['value'], 10, 'Fermentation temp check')
+
     if not check.any_failures():  # Will run only if previous passed
-        has_hops(beer, Hops('Hersbrucker', {'value': 6.25, 'unit': 'grams'}, 'middle', 'flavour'))
-        acidulated_malt = next(malt for malt in beer['ingredients']['malt'] if malt['name'] == 'Acidulated Malt')
-        check.equal(acidulated_malt['amount']['value'], 0.07, 'Acidulated Malt amount check')
+        expected_hops = IngredientWithInstructions('Hersbrucker', {'value': 6.25, 'unit': 'grams'}, 'middle', 'flavour')
+        has_ingredient(beer, 'hops', expected_hops)
+
+        expected_malt = (Ingredient('Acidulated Malt', {'value': 0.07, 'unit': 'kilograms'}), 'Acidulated Malt check')
+        has_ingredient(beer, 'malt', *expected_malt)
 
 
 def test_2_delete():
