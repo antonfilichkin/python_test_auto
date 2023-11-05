@@ -15,12 +15,13 @@ ${BROWSER}    Chrome
 
 *** Test Cases ***
 Login existing user
-    [Documentation]  Login with existing user credentials
-    [Tags]  Login
+    [Documentation]    Login with existing user credentials
+    [Tags]    Login
 
     Wait Until Element Is Visible    login2
     Click Element    login2
 
+    Wait Until Element Is Visible    logInModal
     Element Should Be Visible    loginusername
     Element Should Be Visible    loginpassword
 

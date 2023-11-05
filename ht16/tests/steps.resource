@@ -4,7 +4,8 @@ Library          SeleniumLibrary
 
 *** Keywords ***
 Log in
-    [Arguments]  ${USER_NAME}  ${USER_PASS}
+    [Documentation]    Performs Login
+    [Arguments]    ${USER_NAME}    ${USER_PASS}
     Wait Until Element Is Visible    login2
     Click Element    login2
     Input Text    loginusername    ${USER_NAME}
@@ -13,6 +14,8 @@ Log in
     Should Be Logged As    ${USER_NAME}
 
 Should Be Logged As
-    [Arguments]  ${USER_NAME}
-    Wait Until Element Is Visible  nameofuser  2
-    Element Text Should Be  nameofuser  Welcome ${USER_NAME}
+    [Documentation]    Checks If User Name Is Present In The Top Menu
+    [Tags]    Screenshot
+    [Arguments]    ${USER_NAME}
+    Wait Until Element Is Visible    nameofuser    5
+    Element Text Should Be    nameofuser    Welcome ${USER_NAME}
