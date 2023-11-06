@@ -16,7 +16,7 @@ ${BROWSER}    Chrome
 *** Test Cases ***
 Login existing user
     [Documentation]    Login with existing user credentials
-    [Tags]    Login
+    [Tags]    All  Login
 
     Wait Until Element Is Visible    login2
     Click Element    login2
@@ -30,3 +30,25 @@ Login existing user
     Click Button    css:button[onclick="logIn()"]
 
     Should Be Logged As    ${USER_NAME}
+
+
+Add product to cart
+    [Documentation]    Add product to cart
+    [Tags]    All  Clean_cart
+    [Teardown]    Empty The Cart
+
+    Log in    ${USER_NAME}  ${USER_PASS}
+    Select Category    Monitors
+
+    Select Product With The Highest Price
+    Element Text Should Be    tbodyid >> css:h2    Apple monitor 24
+    Element Text Should Be    tbodyid >> css:h3    $400 *includes tax
+
+    Click Element    tbodyid >> css:a
+    Handle Alert    timeout=5s
+
+    Open Cart
+
+    Element Text Should Be    tbodyid >> css:td:nth-child(2)    Apple monitor 24
+    Element Text Should Be    tbodyid >> css:td:nth-child(3)    400
+    Element Text Should Be    totalp    400

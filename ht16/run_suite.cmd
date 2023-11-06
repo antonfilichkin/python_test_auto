@@ -1,1 +1,1 @@
-robot -i Login --listener libs\ScreenshotListener.py tests\suite.robot
+robot -i All --listener libs\ScreenshotListener.py tests\suite.robot
