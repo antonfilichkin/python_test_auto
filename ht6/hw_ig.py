@@ -1,7 +1,7 @@
 # 1. Implement a function that flatten incoming data:
 # non-iterables and elements from iterables (any nesting depth should be supported)
 # function should return an iterator (generator function)
-# don't use third-party libs
+# don't use third-party libraries
 
 def merge_elems(*elems):
     for element in elems:

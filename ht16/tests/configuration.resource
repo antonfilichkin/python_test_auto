@@ -25,5 +25,5 @@ Clean Up Cart Teardown
     Open Cart
 
     IF    ${TEST_TAGS} contains Clean_cart
-        Run Keyword and Ignore Error    Empty The Cart
+        Empty The Cart
     END
