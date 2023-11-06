@@ -2,6 +2,7 @@
 Documentation    Custom steps keywords
 Library          SeleniumLibrary
 Library          String
+Library          ../libs/SeleniumCustom.py
 
 *** Keywords ***
 Log in
@@ -21,7 +22,7 @@ Should Be Logged As
     [Tags]    Screenshot
     [Arguments]    ${USER_NAME}
 
-    Wait Until Element Is Visible    nameofuser    5
+    Wait Until Element Is Visible    nameofuser    5s
     Element Text Should Be    nameofuser    Welcome ${USER_NAME}
 
 
@@ -31,7 +32,7 @@ Select Category
     [Arguments]    ${CATEGORY}
 
     Assign Id To Element    class:card    firstCardElement
-    Click Element     xpath://div[@class='list-group']/a[text()='${CATEGORY}']
+    Click Element    xpath://div[@class='list-group']/a[text()='${CATEGORY}']
     Wait Until Element Is Not Visible    firstCardElement
     Wait Until Element Is Visible    class:card
 
@@ -40,22 +41,22 @@ Select Product With The Highest Price
     [Documentation]    Clicks on a product card with maximum price and waits for product page to load
     [Tags]    Screenshot
 
-    ${CURRENT_ELEMENT_INDEX}=     Set Variable    0
+    ${CURRENT_ELEMENT_INDEX}=    Set Variable    0
     ${MAX_PRICE}=    Set Variable    0
     ${CARD_PRICE_WEBELEMENTS}=    Get WebElements    class:card-block h5
 
     FOR    ${CARD_PRICE}    IN    @{CARD_PRICE_WEBELEMENTS}
         ${CURRENT_ELEMENT_INDEX}=    Evaluate    ${CURRENT_ELEMENT_INDEX} + 1
         ${PRICE_AS_TEXT}=    Get Text    ${CARD_PRICE}
-        ${PRICE_WITHOUT_CURRENCY_SIGN}=    Get Substring     ${PRICE_AS_TEXT}    1
+        ${PRICE_WITHOUT_CURRENCY_SIGN}=    Get Substring    ${PRICE_AS_TEXT}    1
         ${PRICE}=    Convert To Number    ${PRICE_WITHOUT_CURRENCY_SIGN}
         IF 	  ${PRICE} > ${MAX_PRICE}
-            ${MAX_PRICE}=      Set Variable    ${PRICE}
-            ${MAX_PRICE_ELEMENT_INDEX}=     Set Variable    ${CURRENT_ELEMENT_INDEX}
+            ${MAX_PRICE}=    Set Variable    ${PRICE}
+            ${MAX_PRICE_ELEMENT_INDEX}=    Set Variable    ${CURRENT_ELEMENT_INDEX}
         END
     END
 
-    Click Element     tbodyid >> class:card-block a:nth-child(${MAX_PRICE_ELEMENT_INDEX})
+    Click Element    tbodyid >> class:card-block a:nth-child(${MAX_PRICE_ELEMENT_INDEX})
 
 
 Open Cart
@@ -73,11 +74,13 @@ Open Cart
 Empty The Cart
     [Documentation]    Delete all the cart entries
 
-    ${CART_ENTRIES_COUNT}=    Get Element Count    tbodyid >> css:tr td a
+    ${FIRST_ROW_DELETE_BUTTON_LOCATOR}=    Set Variable    tbodyid >> css:tr td a
+    ${CART_ENTRIES_COUNT}=    Get Element Count    ${FIRST_ROW_DELETE_BUTTON_LOCATOR}
+
     WHILE    ${CART_ENTRIES_COUNT} > 0
-        Assign Id To Element    tbodyid >> css:tr td a    element
-        Click Element    element
-        Wait Until Element Is Not Visible    element    2s
-        Run Keyword And Ignore Error    Wait Until Element Is Visible    tbodyid >> css:tr td    1
-        ${CART_ENTRIES_COUNT}=    Get Element Count    tbodyid >> css:tr td a
+        Log    Found records in cart - deleting the first one
+        ${WEB_ELEMENT}=    Get WebElement    ${FIRST_ROW_DELETE_BUTTON_LOCATOR}
+        Click Element    ${WEB_ELEMENT}
+        Wait Until Element Is Stale    ${WEB_ELEMENT}    5s    1s
+        ${CART_ENTRIES_COUNT}=    Get Element Count    ${FIRST_ROW_DELETE_BUTTON_LOCATOR}
     END
