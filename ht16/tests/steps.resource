@@ -63,7 +63,7 @@ Open Cart
     [Documentation]    Opens cart
     [Arguments]    ${FAIL_EMPTY}=False
 
-    Click Element    cartur
+    Click Element    //a[text()="Cart"]
     IF    ${FAIL_EMPTY}
         Wait Until Element Is Visible    tbodyid >> css:tr td    5s
     ELSE

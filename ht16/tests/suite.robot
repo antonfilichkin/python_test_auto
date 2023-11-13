@@ -34,10 +34,10 @@ Login existing user
 
 Add product to cart
     [Documentation]    Add product to cart
-    [Tags]    All  Clean_cart
-    [Teardown]    Empty The Cart
+    [Tags]    All    Clean_cart
+    [Setup]    Open Set Up Driver And Login    ${HOME_PAGE}  ${BROWSER}   ${USER_NAME}  ${USER_PASS}
+    [Teardown]    Clean Up Cart
 
-    Log in    ${USER_NAME}  ${USER_PASS}
     Select Category    Monitors
 
     Select Product With The Highest Price

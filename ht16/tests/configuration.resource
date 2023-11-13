@@ -18,12 +18,23 @@ Open And Set Up Driver
     Set Selenium Implicit Wait    5s
 
 
-Clean Up Cart Teardown
-    [Teardown]
+Open Set Up Driver And Login
+    [Documentation]    Creates and configures driver, opens sut and logins
+    [Arguments]    ${HOME_PAGE}    ${BROWSER}    ${USER_NAME}    ${USER_PASS}
+
+    Open And Set Up Driver    ${HOME_PAGE}    ${BROWSER}
+    Log in    ${USER_NAME}    ${USER_PASS}
+
+
+Clean Up Cart
     [Documentation]    Cleans up cart
 
     Open Cart
+    Run Keyword If    'Clean_cart' in ${TEST_TAGS}    Empty The Cart
 
-    IF    ${TEST_TAGS} contains Clean_cart
-        Empty The Cart
-    END
+
+Clean Up Cart and Close Browser
+    [Documentation]    Cleans up cart
+
+    Clean Up Cart
+    Close Browser
