@@ -5,15 +5,15 @@
 
 def merge_elems(*elems):
     for element in elems:
-        try:
-            iter(element)
+        if hasattr(element, '__iter__'):
             if isinstance(element, str):
                 for char in element:
                     yield char
             else:
                 yield from merge_elems(*element)
-        except TypeError:
+        else:
             yield element
+
 #
 # # example input
 # a = [1, 2, 3]
